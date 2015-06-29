@@ -20,7 +20,7 @@
 
 #include <stdint.h>
 
-#ifdef __AVR_AT90USB1286__
+#if defined(__AVR_AT90USB1286__) || defined(__AVR_ATmega32U4__)
 # define SPI_DDR      DDRB
 # define SPI_PORT     PORTB
 # define SPI_SS_PIN   0

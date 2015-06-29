@@ -18,9 +18,9 @@
 #ifndef __NRF24_H__
 #define __NRF24_H__
 
-#define NRF_CE_DDR  DDRE
-#define NRF_CE_PORT PORTE
-#define NRF_CE_PIN  0
+#define NRF_CE_DDR  DDRD
+#define NRF_CE_PORT PORTD
+#define NRF_CE_PIN  5
 
 /* Register Map */
 #define REG_CONFIG        0x00  /* config register */
@@ -70,6 +70,10 @@
 #define REG_CONFIG_EN_PWR_UP      1
 #define REG_CONFIG_EN_PRIM_RX     0
 
+#define REG_STATUS_RX_DR          6
+#define REG_STATUS_TX_DS          5
+#define REG_STATUS_MAX_RT         4
+#define REG_STATUS_TX_FULL        0
 
 extern void nrf24_init(void);
 extern void nrf24_enable(int enable);
@@ -81,6 +85,10 @@ extern uint8_t nrf24_read_register(uint8_t reg);
 extern void nrf24_write_register(uint8_t reg, uint8_t value);
 extern void nrf24_power_up(int powerup);
 extern void nrf24_config_tx(void);
+extern void nrf24_config_rx(void);
 extern void nrf24_transmit(uint8_t *buf, uint8_t len);
+extern int nrf24_receive(uint8_t *buf, uint8_t len);
+extern void nrf24_reset_irq(void);
+
 
 #endif /* __NRF24_H__ */

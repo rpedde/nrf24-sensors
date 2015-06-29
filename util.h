@@ -21,7 +21,7 @@
 #define SETBIT(byte, bit) (byte) |= (1 << (bit))
 #define CLEARBIT(byte, bit) (byte) &= (~(1 << (bit)))
 #define ISSET(byte, bit) (byte) & (1 << (bit))
-#define ISCLEAR(byte, bit) !ISSET((byte), (bit))
+#define ISCLEAR(byte, bit) !(ISSET((byte), (bit)))
 
 #define FALSE 0
 #define TRUE  1

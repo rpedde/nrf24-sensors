@@ -100,14 +100,15 @@ EXTRAINCDIRS =
 #     gnu99 = c99 plus GCC extensions
 CSTANDARD = -std=gnu99
 
+# opmode is either TXMODE or RXMODE
+OPMODE ?= TXMODE
 
 # Place -D or -U options here
-CDEFS = -DF_CPU=$(F_CPU)UL -DDEBUG
+CDEFS = -DF_CPU=$(F_CPU)UL -D$(OPMODE) -DDEBUG
 
 
 # Place -I options here
 CINCS =
-
 
 
 #---------------- Compiler Options ----------------

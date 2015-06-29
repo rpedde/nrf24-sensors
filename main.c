@@ -1,5 +1,6 @@
 #include <avr/io.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <util/delay.h>
 #include <avr/interrupt.h>
@@ -29,10 +30,20 @@ void dump_status(void) {
     DPRINTF(" TX_ADDR:     %02x%02x%02x%02x%02x\n\r",
             addrbuffer[0], addrbuffer[1], addrbuffer[2],
             addrbuffer[3], addrbuffer[4]);
+
+    nrf24_read_write_vector_register(REG_READ,
+                                     REG_RX_ADDR_P0,
+                                     addrbuffer,
+                                     5);
+
+    DPRINTF(" RX_ADDR:     %02x%02x%02x%02x%02x\n\r",
+            addrbuffer[0], addrbuffer[1], addrbuffer[2],
+            addrbuffer[3], addrbuffer[4]);
 }
 
 int main(int argc, char *argv[]) {
     char *spinner="/-\\|";
+    uint8_t packet_buffer[32];
 
     CPU_PRESCALE(0x01);
 
@@ -44,8 +55,14 @@ int main(int argc, char *argv[]) {
 
     dump_status();
 
-    DPRINTF("Turning on radio\n\r");
+
+#ifdef TXMODE
+    DPRINTF("Entering transmit mode\n\r");
     nrf24_config_tx();
+#else
+    DPRINTF("Entering receive mode\n\r");
+    nrf24_config_rx();
+#endif
 
     DPRINTF("New status\n\r");
     dump_status();
@@ -56,8 +73,17 @@ int main(int argc, char *argv[]) {
         for(uint8_t x=0; x<4; x++) {
             uart_send_char(spinner[x]);
             uart_send_char('\r');
+#ifdef TXMODE
+#warning BUILDING FOR TX MODE
             nrf24_transmit((uint8_t *)"hello", 5);
             _delay_ms(1000);
+#else
+#warning BUILDING FOR RX MODE
+            memset(packet_buffer, 0, sizeof(packet_buffer));
+            if(nrf24_receive(packet_buffer, sizeof(packet_buffer))) {
+                DPRINTF("Got packet: %s\n\r", packet_buffer);
+            }
+#endif
         }
     }
 }

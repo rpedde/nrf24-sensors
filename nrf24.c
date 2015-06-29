@@ -77,6 +77,65 @@ void nrf24_config_tx(void) {
     nrf24_power_up(TRUE);
 }
 
+void nrf24_config_rx(void) {
+    uint8_t addr[] = {0xff, 0xff, 0xff, 0xff, 0xff};
+
+    /* TX Mode, with CRC, no interrupts, 16 bit crc */
+    nrf24_write_register(REG_CONFIG, ((1 << REG_CONFIG_MASK_RX_DR) |
+                                      (1 << REG_CONFIG_MASK_TX_DR) |
+                                      (1 << REG_CONFIG_MASK_MAX_RT) |
+                                      (1 << REG_CONFIG_EN_CRC) |
+                                      (1 << REG_CONFIG_EN_CRCO) |
+                                      (1 << REG_CONFIG_EN_PRIM_RX)));
+
+    /* disable AA on all pipes */
+    nrf24_write_register(REG_EN_AA, 0x00);
+
+    /* Set address width to 3 (5 bytes) - match rpi */
+    nrf24_write_register(REG_SETUP_AW, 0x03);
+
+    /* Turn off auto retransmission */
+    nrf24_write_register(REG_SETUP_RETR, 0x00);
+
+    /* Set rf channel to match rpi */
+    nrf24_write_register(REG_RF_CH, 0x4c);
+
+    /* setup air data rate to 1Mbsp to match rpi */
+    nrf24_write_register(REG_RF_SETUP, 0x03);
+
+    /* set rx addr */
+    nrf24_read_write_vector_register(REG_WRITE,
+                                     REG_RX_ADDR_P0,
+                                     addr,
+                                     sizeof(addr));
+
+    nrf24_power_up(TRUE);
+}
+
+int nrf24_receive(uint8_t *buf, uint8_t len) {
+    nrf24_reset_irq();
+    nrf24_write_register(REG_FLUSH_RX, 0);
+
+    nrf24_enable(TRUE);
+    _delay_ms(1000);
+    nrf24_enable(FALSE);
+
+    uint8_t status = nrf24_read_register(REG_STATUS);
+    if(ISCLEAR(status, REG_STATUS_RX_DR))
+        return FALSE;
+
+    nrf24_read_write_vector_register(REG_READ,
+                                     REG_READ_RX,
+                                     buf,
+                                     len);
+    nrf24_write_register(REG_FLUSH_RX, 0);
+    return TRUE;
+}
+
+void nrf24_reset_irq(void) {
+    nrf24_write_register(REG_STATUS, 0x70);
+}
+
 void nrf24_transmit(uint8_t *buf, uint8_t len) {
     nrf24_write_register(REG_FLUSH_TX, 0);
     nrf24_read_write_vector_register(REG_WRITE,
@@ -88,6 +147,7 @@ void nrf24_transmit(uint8_t *buf, uint8_t len) {
     _delay_us(20);
     nrf24_enable(FALSE);
     _delay_ms(10);
+    nrf24_reset_irq();
 }
 
 void nrf24_power_up(int powerup) {
