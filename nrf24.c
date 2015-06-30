@@ -66,13 +66,19 @@ void nrf24_config_tx(void) {
     nrf24_write_register(REG_RF_CH, 0x4c);
 
     /* setup air data rate to 1Mbsp to match rpi */
-    nrf24_write_register(REG_RF_SETUP, 0x03);
+    nrf24_write_register(REG_RF_SETUP, 0x07);
 
     /* set tx addr */
     nrf24_read_write_vector_register(REG_WRITE,
                                      REG_TX_ADDR,
                                      addr,
                                      sizeof(addr));
+
+    /* enable read pipe 0 */
+    nrf24_write_register(REG_EN_RXADDR, 1 << REG_RXADDR_ERX_P0);
+
+    /* set rx size */
+    nrf24_write_register(REG_RX_PW_P0, 5);
 
     nrf24_power_up(TRUE);
 }
@@ -101,7 +107,7 @@ void nrf24_config_rx(void) {
     nrf24_write_register(REG_RF_CH, 0x4c);
 
     /* setup air data rate to 1Mbsp to match rpi */
-    nrf24_write_register(REG_RF_SETUP, 0x03);
+    nrf24_write_register(REG_RF_SETUP, 0x07);
 
     /* set rx addr */
     nrf24_read_write_vector_register(REG_WRITE,
@@ -109,10 +115,19 @@ void nrf24_config_rx(void) {
                                      addr,
                                      sizeof(addr));
 
+    /* enable read pipe 0 */
+    nrf24_write_register(REG_EN_RXADDR, 1 << REG_RXADDR_ERX_P0);
+
+    /* set rx size */
+    nrf24_write_register(REG_RX_PW_P0, 5);
+
     nrf24_power_up(TRUE);
+    _delay_ms(100);
 }
 
-int nrf24_receive(uint8_t *buf, uint8_t len) {
+int nrf24_receive(uint8_t *buf, uint8_t len, uint8_t pipe) {
+    uint8_t actual_len;
+
     nrf24_reset_irq();
     nrf24_write_register(REG_FLUSH_RX, 0);
 
@@ -124,10 +139,13 @@ int nrf24_receive(uint8_t *buf, uint8_t len) {
     if(ISCLEAR(status, REG_STATUS_RX_DR))
         return FALSE;
 
+    /* find the length of data in the buffer */
+    actual_len = nrf24_read_register(REG_RX_PW_P0 + pipe);
+
     nrf24_read_write_vector_register(REG_READ,
                                      REG_READ_RX,
                                      buf,
-                                     len);
+                                     actual_len);
     nrf24_write_register(REG_FLUSH_RX, 0);
     return TRUE;
 }

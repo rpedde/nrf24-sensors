@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
 #else
 #warning BUILDING FOR RX MODE
             memset(packet_buffer, 0, sizeof(packet_buffer));
-            if(nrf24_receive(packet_buffer, sizeof(packet_buffer))) {
+            if(nrf24_receive(packet_buffer, sizeof(packet_buffer), 0)) {
                 DPRINTF("Got packet: %s\n\r", packet_buffer);
             }
 #endif

@@ -40,12 +40,12 @@
 #define REG_RX_ADDR_P4    0x0e  /* receive address data pipe 4 */
 #define REG_RX_ADDR_P5    0x0f  /* receive address data pipe 5 */
 #define REG_TX_ADDR       0x10  /* transmit address */
-#define REG_RX_P0         0x11  /* bytes in rx payload in pipe 0 */
-#define REG_RX_P1         0x12  /* bytes in rx payload in pipe 1 */
-#define REG_RX_P2         0x13  /* bytes in rx payload in pipe 2 */
-#define REG_RX_P3         0x14  /* bytes in rx payload in pipe 3 */
-#define REG_RX_P4         0x15  /* bytes in rx payload in pipe 4 */
-#define REG_RX_P5         0x16  /* bytes in rx payload in pipe 5 */
+#define REG_RX_PW_P0      0x11  /* bytes in rx payload in pipe 0 */
+#define REG_RX_PW_P1      0x12  /* bytes in rx payload in pipe 1 */
+#define REG_RX_PW_P2      0x13  /* bytes in rx payload in pipe 2 */
+#define REG_RX_PW_P3      0x14  /* bytes in rx payload in pipe 3 */
+#define REG_RX_PW_P4      0x15  /* bytes in rx payload in pipe 4 */
+#define REG_RX_PW_P5      0x16  /* bytes in rx payload in pipe 5 */
 #define REG_FIFO_STATUS   0x17  /* fifo status register */
 #define REG_DYNPD         0x1c  /* enable dynamic payload length */
 
@@ -75,6 +75,13 @@
 #define REG_STATUS_MAX_RT         4
 #define REG_STATUS_TX_FULL        0
 
+#define REG_RXADDR_ERX_P5         5
+#define REG_RXADDR_ERX_P4         4
+#define REG_RXADDR_ERX_P3         3
+#define REG_RXADDR_ERX_P2         2
+#define REG_RXADDR_ERX_P1         1
+#define REG_RXADDR_ERX_P0         0
+
 extern void nrf24_init(void);
 extern void nrf24_enable(int enable);
 extern void nrf24_read_write_vector_register(uint8_t direction,
@@ -87,7 +94,7 @@ extern void nrf24_power_up(int powerup);
 extern void nrf24_config_tx(void);
 extern void nrf24_config_rx(void);
 extern void nrf24_transmit(uint8_t *buf, uint8_t len);
-extern int nrf24_receive(uint8_t *buf, uint8_t len);
+extern int nrf24_receive(uint8_t *buf, uint8_t len, uint8_t pipe);
 extern void nrf24_reset_irq(void);
 
 
