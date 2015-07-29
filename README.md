@@ -12,19 +12,21 @@ PRs welcome.
 
 # TODO #
 
-[ ] Low power/sleep mode rather than polling
+## General ##
+- [ ] Low power/sleep mode rather than polling
 
-[ ] TMP36 temperature sensor
-[ ] DHT22 temperature/humidity sensor
-[ ] DHT11 temperature/humidity sensor
-[ ] DS18B20 temperature sensor
-[X] Switch monitoring
+## TX sensors ##
+- [ ] TMP36 temperature sensor
+- [ ] DHT22 temperature/humidity sensor
+- [ ] DHT11 temperature/humidity sensor
+- [ ] DS18B20 temperature sensor
+- [X] Switch monitoring
 
-[ ] Receive for setting port outputs (rw switch)
-[ ] Receive for controlling RGB LED
+## RX sensors ##
+- [ ] Receive for setting port outputs (rw switch)
+- [ ] Receive for controlling RGB LED
 
 # Uses #
 
 This goes hand-in-hand with https://github.com/rpedde/nrf24-mqtt, a
 mqtt gateway for nrf24 sensors (for raspberry pi)
-
