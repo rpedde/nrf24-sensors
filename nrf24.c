@@ -43,9 +43,7 @@ void nrf24_init(void) {
     DPRINTF("Initialized\n\r");
 }
 
-void nrf24_config_tx(void) {
-    uint8_t addr[] = {0xff, 0xff, 0xff, 0xff, 0xff};
-
+void nrf24_config_tx(uint8_t *tx_addr, uint8_t *rx_addr) {
     /* TX Mode, with CRC, no interrupts, 16 bit crc */
     nrf24_write_register(REG_CONFIG, ((1 << REG_CONFIG_MASK_RX_DR) |
                                       (1 << REG_CONFIG_MASK_TX_DR) |
@@ -71,8 +69,14 @@ void nrf24_config_tx(void) {
     /* set tx addr */
     nrf24_read_write_vector_register(REG_WRITE,
                                      REG_TX_ADDR,
-                                     addr,
-                                     sizeof(addr));
+                                     tx_addr,
+                                     5);
+
+    /* set rx addr 0 */
+    nrf24_read_write_vector_register(REG_WRITE,
+                                     REG_RX_ADDR_P0,
+                                     rx_addr,
+                                     5);
 
     /* enable read pipe 0 */
     nrf24_write_register(REG_EN_RXADDR, 1 << REG_RXADDR_ERX_P0);
@@ -83,9 +87,7 @@ void nrf24_config_tx(void) {
     nrf24_power_up(TRUE);
 }
 
-void nrf24_config_rx(void) {
-    uint8_t addr[] = {0xff, 0xff, 0xff, 0xff, 0xff};
-
+void nrf24_config_rx(uint8_t *rx_addr) {
     /* TX Mode, with CRC, no interrupts, 16 bit crc */
     nrf24_write_register(REG_CONFIG, ((1 << REG_CONFIG_MASK_RX_DR) |
                                       (1 << REG_CONFIG_MASK_TX_DR) |
@@ -112,8 +114,8 @@ void nrf24_config_rx(void) {
     /* set rx addr */
     nrf24_read_write_vector_register(REG_WRITE,
                                      REG_RX_ADDR_P0,
-                                     addr,
-                                     sizeof(addr));
+                                     rx_addr,
+                                     5);
 
     /* enable read pipe 0 */
     nrf24_write_register(REG_EN_RXADDR, 1 << REG_RXADDR_ERX_P0);

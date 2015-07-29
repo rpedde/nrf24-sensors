@@ -1,0 +1,8 @@
+*.lst
+*.o
+*.hex
+main.*
+hardware.c
+hardware.h
+hardware.mk
+.dep

@@ -1,0 +1,21 @@
+# Makefile auto-generated from profile "{{ source_file }}"
+
+# MCU name
+MCU = {{ mcu }}
+
+# Processor frequency
+#     This will define a symbol, F_CPU, in all source code files equal to the
+#     processor frequency. You can then use this symbol in your source code to
+#     calculate timings. Do NOT tack on a 'UL' at the end, this will be done
+#     automatically to create a 32-bit value in your source code.
+F_CPU = {{ f_cpu if f_cpu is defined else 8000000 }}
+
+
+# Extra cflags
+EXTRA_CDEFS = {{ extra_cdefs|join(' ') }}
+
+# Extra sources (soft_uart.c, etc)
+EXTRA_SOURCES = {{ extra_sources|join(' ') }}
+
+# Extra ldflags
+EXTRA_LDFLAGS = {{ extra_ldflags|join(' ') }}

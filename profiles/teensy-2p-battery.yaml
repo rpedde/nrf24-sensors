@@ -1,0 +1,23 @@
+mcu: at90usb1286
+f_cpu: 8000000
+debug: true
+rx_address: AEAEAEAE00
+tx_address: AEAEAEAEFF
+
+uart:
+  type: soft
+  baud: 9600
+  port: D
+  pin: 7
+
+# battery:
+#   battery_pin: 0
+#   vcc_pin: 1
+#   vcc: 3.3
+
+switch:
+  irq_pin: 7
+  port: F
+  switches:
+    - { pin: 0 }
+    - { pin: 1 }

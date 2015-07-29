@@ -39,17 +39,7 @@
 #----------------------------------------------------------------------------
 
 
-# MCU name
-MCU = at90usb1286
-
-
-# Processor frequency.
-#     This will define a symbol, F_CPU, in all source code files equal to the
-#     processor frequency. You can then use this symbol in your source code to
-#     calculate timings. Do NOT tack on a 'UL' at the end, this will be done
-#     automatically to create a 32-bit value in your source code.
-F_CPU = 8000000
-
+include hardware.mk
 
 # Output format. (can be srec, ihex, binary)
 FORMAT = ihex
@@ -60,7 +50,7 @@ TARGET = main
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = $(TARGET).c soft_uart.c spi.c nrf24.c
+SRC = $(TARGET).c spi.c nrf24.c $(EXTRA_SOURCES)
 
 
 # List Assembler source files here.
@@ -104,8 +94,7 @@ CSTANDARD = -std=gnu99
 OPMODE ?= TXMODE
 
 # Place -D or -U options here
-CDEFS = -DF_CPU=$(F_CPU)UL -D$(OPMODE) -DDEBUG
-
+CDEFS = -DF_CPU=$(F_CPU)UL $(EXTRA_CDEFS)
 
 # Place -I options here
 CINCS =
@@ -190,7 +179,7 @@ EXTMEMOPTS =
 #    --cref:    add cross reference to  map file
 LDFLAGS = -Wl,-Map=$(TARGET).map,--cref
 LDFLAGS += $(EXTMEMOPTS)
-LDFLAGS += $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB)
+LDFLAGS += $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB) $(EXTRA_LDFLAGS)
 
 
 

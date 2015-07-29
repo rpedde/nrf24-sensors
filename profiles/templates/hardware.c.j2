@@ -1,0 +1,59 @@
+/*
+ * hardware.c Copyright (C) 2015 Ron Pedde <ron@pedde.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* Source file auto-generated from profile "{{ source_file }}" */
+
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <util/delay.h>
+
+#include "util.h"
+#include "hardware.h"
+
+/* hardware addresses */
+uint8_t rx_address[5] = {
+    0x{{ rx_address[0:2] }},
+    0x{{ rx_address[2:4] }},
+    0x{{ rx_address[4:6] }},
+    0x{{ rx_address[6:8] }},
+    0x{{ rx_address[8:10] }}
+};
+
+uint8_t tx_address[5] = {
+    0x{{ tx_address[0:2] }},
+    0x{{ tx_address[2:4] }},
+    0x{{ tx_address[4:6] }},
+    0x{{ tx_address[6:8] }},
+    0x{{ tx_address[8:10] }}
+};
+
+{% if switch is defined -%}
+/* Switch data */
+switch_record_t switch_records[{{switch.switches|length}}] = {
+{% for item in switch.switches -%}
+    {{ '   { ' + item.pin|string }}, 0 },
+{% endfor -%}
+};
+
+volatile uint8_t switch_irq = 0;
+
+/* Interrupt service routing for switch press */
+ISR(INT{{switch.irq_pin}}_vect) {
+    DPRINTF("Switch IRQ\n\r");
+    switch_irq = 1;
+}
+{% endif %}

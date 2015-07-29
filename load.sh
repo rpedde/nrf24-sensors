@@ -14,4 +14,4 @@ if [ "${MCU}" == "" ]; then
 fi
 
 
-teensy_loader_cli -w --mcu=${MCU} main-${MCU}.hex
+teensy_loader_cli -w --mcu=${MCU} main.hex

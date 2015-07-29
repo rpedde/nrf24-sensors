@@ -1,5 +1,5 @@
 /*
- * nrf24.c Copyright (C) 2015 Ron Pedde <ron@pedde.com>
+ * switch.h Copyright (C) 2015 Ron Pedde <ron@pedde.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,23 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __UTIL_H__
-#define __UTIL_H__
+#ifndef _SWITCH_H_
+#define _SWITCH_H_
 
-#define SETBIT(byte, bit) (byte) |= (1 << (bit))
-#define CLEARBIT(byte, bit) (byte) &= (~(1 << (bit)))
-#define ISSET(byte, bit) (byte) & (1 << (bit))
-#define ISCLEAR(byte, bit) !(ISSET((byte), (bit)))
+#include <avr/io.h>
+#include "hardware.h"
 
-#define FALSE 0
-#define TRUE  1
-
-#ifdef DEBUG
-extern void uart_printf(char *fmt, ...);
-
-# define DPRINTF(fmt, args...) uart_printf(fmt, ##args)
-#else
-# define DPRINTF(fmt, args...)
+#ifndef SWITCH_INTERRUPT
+# define SWITCH_INTERRUPT INT0
 #endif
 
-#endif /* __UTIL_H__ */
+extern void switch_init(void);
+extern void switch_sleep(void);
+extern void switch_wake(void);
+extern float switch_get(int which);
+
+#endif /* _SWITCH_H_ */

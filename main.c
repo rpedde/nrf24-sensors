@@ -9,6 +9,16 @@
 #include "spi.h"
 #include "nrf24.h"
 #include "util.h"
+#include "hardware.h"
+#include "sensor.h"
+
+#ifdef BATTERY_SENSOR
+#include "battery.h"
+#endif
+
+#ifdef SWITCH_SENSOR
+#include "switch.h"
+#endif
 
 #define CPU_PRESCALE(n) (CLKPR = 0x80, CLKPR = (n))
 
@@ -41,49 +51,76 @@ void dump_status(void) {
             addrbuffer[3], addrbuffer[4]);
 }
 
+void init_sensors(void) {
+#ifdef BATTERY_SENSOR
+    battery_init();
+#endif
+
+#ifdef SWITCH_SENSOR
+    switch_init();
+#endif
+}
+
+void sleep(void) {
+#ifdef BATTERY_SENSOR
+    battery_sleep();
+#endif
+
+#ifdef SWITCH_SENSOR
+    switch_sleep();
+#endif
+}
+
+void wake(void) {
+#ifdef BATTERY_SENSOR
+    battery_wake();
+#endif
+
+#ifdef SWITCH_SENSOR
+    switch_wake();
+#endif
+}
+
 int main(int argc, char *argv[]) {
-    char *spinner="/-\\|";
-    uint8_t packet_buffer[32];
+    sensor_struct_t packet;
 
     CPU_PRESCALE(0x01);
 
     uart_init();
 
     DPRINTF("\x1b[2J\x1b[1;1H** Start **\n\r\n\r");
+    DPRINTF("sizeof packet: %d\n\r", sizeof(packet));
 
     nrf24_init();
+    nrf24_config_tx(tx_address, rx_address);
 
-    dump_status();
-
-
-#ifdef TXMODE
-    DPRINTF("Entering transmit mode\n\r");
-    nrf24_config_tx();
-#else
-    DPRINTF("Entering receive mode\n\r");
-    nrf24_config_rx();
-#endif
-
-    DPRINTF("New status\n\r");
     dump_status();
 
     _delay_ms(100);
 
+    memcpy(packet.addr, rx_address, sizeof(packet.addr));
+
+    /* init hardware sensors */
+    init_sensors();
+
     while(1) {
-        for(uint8_t x=0; x<4; x++) {
-            uart_send_char(spinner[x]);
-            uart_send_char('\r');
-#ifdef TXMODE
-#warning BUILDING FOR TX MODE
-            nrf24_transmit((uint8_t *)"hello", 5);
-            _delay_ms(1000);
-#else
-#warning BUILDING FOR RX MODE
-            memset(packet_buffer, 0, sizeof(packet_buffer));
-            if(nrf24_receive(packet_buffer, sizeof(packet_buffer), 0)) {
-                DPRINTF("Got packet: %s\n\r", packet_buffer);
-            }
+#ifdef BATTERY_SENSOR
+        battery_get();
 #endif
+
+#ifdef SWITCH_SENSOR
+        for(int x = 0; x < SWITCH_LENGTH; x++) {
+            int val = switch_get(x);
+            if (val != -1) {
+                DPRINTF("Switch %d: new state: %d\n\r", x, val);
+                packet.type = SENSOR_TYPE_RO_SWITCH;
+                packet.type_instance = x;
+                packet.value.uint8_value = val;
+                nrf24_transmit((uint8_t *)&packet, sizeof(packet));
+            }
         }
+#endif
+        while(!switch_irq);
+        switch_irq = 0;
     }
 }

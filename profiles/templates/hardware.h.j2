@@ -1,0 +1,78 @@
+/*
+ * hardware.h Copyright (C) 2015 Ron Pedde <ron@pedde.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef _HARDWARE_H_
+#define _HARDWARE_H_
+
+/* Header file auto-generated from profile "{{ source_file }}" */
+
+#include <stdint.h>
+
+extern uint8_t rx_address[5];  /* 0x{{ rx_address }} */
+extern uint8_t tx_address[5];  /* 0x{{ tx_address }} */
+
+{% if uart is defined and uart.type == 'soft' and debug is defined and debug -%}
+/* Soft UART Defines */
+#define UART_SOFT_BAUD {{ uart.baud }}
+#define UART_SOFT_DDR  DDR{{ uart.port }}
+#define UART_SOFT_PORT PORT{{ uart.port }}
+#define UART_SOFT_PIN  {{ uart.pin }}
+{% else -%}
+/* No soft uart, or debugging disabled */
+{% endif %}
+
+{% if battery is defined -%}
+/* Battery defines */
+#define BATTERY_SENSOR    /* enable battery sensing */
+#define BATTERY_ADC_PIN {{ battery.battery_pin }} /* ADC battery pin */
+#define BATTERY_VCC_PIN {{ battery.vcc_pin }} /* ADC vcc pin */
+#define BATTERY_VCC     {{ battery.vcc }}
+{% else -%}
+/* No battery sensor */
+#undef BATTERY_SENSOR      /* disable battery sensing */
+{% endif %}
+
+{% if switch is defined -%}
+/* Switch defines */
+#define SWITCH_SENSOR
+
+#define SWITCH_IRQ  INT{{switch.irq_pin}}
+#define SWITCH_DDR  DDR{{switch.port}}
+#define SWITCH_PIN  PIN{{switch.port}}
+#define SWITCH_PORT PORT{{switch.port}}
+{% if switch.irq_pin > 3 -%}
+#define SWITCH_EIC  EICRB
+{% else -%}
+#define SWITCH_EIC  EICRA
+{% endif %}
+#define SWITCH_ISC0 ISC{{switch.irq_pin}}0
+#define SWITCH_ISC1 ISC{{switch.irq_pin}}1
+
+typedef struct switch_record_t {
+    int pin;
+    int state;
+} switch_record_t;
+
+#define SWITCH_LENGTH {{ switch.switches|length }}
+
+extern switch_record_t switch_records[{{ switch.switches|length }}];
+extern volatile uint8_t switch_irq;
+
+{% else -%}
+#undef SWITCH_SENSOR
+{% endif %}
+#endif /* _HARDWARE_H_ */

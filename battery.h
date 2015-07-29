@@ -1,5 +1,5 @@
 /*
- * nrf24.c Copyright (C) 2015 Ron Pedde <ron@pedde.com>
+ * battery.h Copyright (C) 2015 Ron Pedde <ron@pedde.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,23 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __UTIL_H__
-#define __UTIL_H__
+#ifndef _BATTERY_H_
+#define _BATTERY_H_
 
-#define SETBIT(byte, bit) (byte) |= (1 << (bit))
-#define CLEARBIT(byte, bit) (byte) &= (~(1 << (bit)))
-#define ISSET(byte, bit) (byte) & (1 << (bit))
-#define ISCLEAR(byte, bit) !(ISSET((byte), (bit)))
-
-#define FALSE 0
-#define TRUE  1
-
-#ifdef DEBUG
-extern void uart_printf(char *fmt, ...);
-
-# define DPRINTF(fmt, args...) uart_printf(fmt, ##args)
-#else
-# define DPRINTF(fmt, args...)
+#ifndef BATTERY_VCC
+# define BATTERY_VCC 3.3
 #endif
 
-#endif /* __UTIL_H__ */
+#if defined(__AVR_AT90USB1286__)
+# define ADC_PORT PORTF
+# define ADC_DDR  DDRF
+# define ADMUX_INTERNAL _BV(REFS0) | _BV(MUX4) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1)
+#else
+# error Unhandled ADC port
+#endif
+
+extern void battery_init(void);
+extern void battery_sleep(void);
+extern void battery_wake(void);
+extern float battery_get(void);
+
+#endif /* _BATTERY_H_ */

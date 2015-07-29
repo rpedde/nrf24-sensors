@@ -91,8 +91,8 @@ extern void nrf24_read_write_vector_register(uint8_t direction,
 extern uint8_t nrf24_read_register(uint8_t reg);
 extern void nrf24_write_register(uint8_t reg, uint8_t value);
 extern void nrf24_power_up(int powerup);
-extern void nrf24_config_tx(void);
-extern void nrf24_config_rx(void);
+extern void nrf24_config_tx(uint8_t *tx_addr, uint8_t *rx_addr);
+extern void nrf24_config_rx(uint8_t *rx_addr);
 extern void nrf24_transmit(uint8_t *buf, uint8_t len);
 extern int nrf24_receive(uint8_t *buf, uint8_t len, uint8_t pipe);
 extern void nrf24_reset_irq(void);
