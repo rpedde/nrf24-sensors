@@ -20,6 +20,10 @@
 #include "switch.h"
 #endif
 
+#ifdef DHT11_SENSOR
+#include "dht11.h"
+#endif
+
 #define CPU_PRESCALE(n) (CLKPR = 0x80, CLKPR = (n))
 
 void dump_status(void) {
@@ -59,6 +63,10 @@ void init_sensors(void) {
 #ifdef SWITCH_SENSOR
     switch_init();
 #endif
+
+#ifdef DHT11_SENSOR
+    dht11_init();
+#endif
 }
 
 void sleep(void) {
@@ -69,6 +77,10 @@ void sleep(void) {
 #ifdef SWITCH_SENSOR
     switch_sleep();
 #endif
+
+#ifdef DHT11_SENSOR
+    dht11_sleep();
+#endif
 }
 
 void wake(void) {
@@ -78,6 +90,10 @@ void wake(void) {
 
 #ifdef SWITCH_SENSOR
     switch_wake();
+#endif
+
+#ifdef DHT11_SENSOR
+    dht11_wake();
 #endif
 }
 
@@ -104,6 +120,8 @@ int main(int argc, char *argv[]) {
     init_sensors();
 
     while(1) {
+        _delay_ms(2000);
+
 #ifdef BATTERY_SENSOR
         battery_get();
 #endif
@@ -120,7 +138,14 @@ int main(int argc, char *argv[]) {
             }
         }
 #endif
-        while(!switch_irq);
-        switch_irq = 0;
+
+#ifdef DHT11_SENSOR
+        dht11_read_data();
+#endif
+
+        _delay_ms(8000);
+
+        /* while(!switch_irq); */
+        /* switch_irq = 0; */
     }
 }

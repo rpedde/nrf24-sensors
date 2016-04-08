@@ -22,6 +22,9 @@ def calculate_metavars(params):
     if 'battery' in params:
         params['extra_sources'].append('battery.c')
 
+    if 'temp' in params and params['temp']['type'] == 'DHT11':
+        params['extra_sources'].append('dht11.c')
+
     if params.get('debug', False):
         params['extra_cdefs'].append('-DDEBUG')
         params['extra_cdefs'].append('-Wl,-u,vfprintf')

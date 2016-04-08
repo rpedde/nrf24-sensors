@@ -21,3 +21,8 @@ switch:
   switches:
     - { pin: 0 }
     - { pin: 1 }
+
+temp:
+  type: DHT11
+  port: F
+  pin: 7
