@@ -23,6 +23,14 @@
 #include "nrf24.h"
 #include "soft_uart.h"
 
+static void fix_addr(uint8_t *src, uint8_t *dst, uint8_t len) {
+    uint8_t idx=0;
+
+    for(idx = 0; idx < len; idx++) {
+        dst[idx] = src[len-idx-1];
+    }
+}
+
 void nrf24_init(void) {
     /* turn on SPI */
     DPRINTF("Initializing nRF24\n\r");
@@ -44,6 +52,8 @@ void nrf24_init(void) {
 }
 
 void nrf24_config_tx(uint8_t *tx_addr, uint8_t *rx_addr) {
+    uint8_t inverted_addr[5];
+
     /* TX Mode, with CRC, no interrupts, 16 bit crc */
     nrf24_write_register(REG_CONFIG, ((1 << REG_CONFIG_MASK_RX_DR) |
                                       (1 << REG_CONFIG_MASK_TX_DR) |
@@ -67,22 +77,24 @@ void nrf24_config_tx(uint8_t *tx_addr, uint8_t *rx_addr) {
     nrf24_write_register(REG_RF_SETUP, 0x07);
 
     /* set tx addr */
+    fix_addr(tx_addr, inverted_addr, 5);
     nrf24_read_write_vector_register(REG_WRITE,
                                      REG_TX_ADDR,
-                                     tx_addr,
+                                     inverted_addr,
                                      5);
 
     /* set rx addr 0 */
+    fix_addr(rx_addr, inverted_addr, 5);
     nrf24_read_write_vector_register(REG_WRITE,
                                      REG_RX_ADDR_P0,
-                                     rx_addr,
+                                     inverted_addr,
                                      5);
 
     /* enable read pipe 0 */
     nrf24_write_register(REG_EN_RXADDR, 1 << REG_RXADDR_ERX_P0);
 
     /* set rx size */
-    nrf24_write_register(REG_RX_PW_P0, 5);
+    nrf24_write_register(REG_RX_PW_P0, 11);
 
     nrf24_power_up(TRUE);
 }
@@ -157,6 +169,7 @@ void nrf24_reset_irq(void) {
 }
 
 void nrf24_transmit(uint8_t *buf, uint8_t len) {
+    DPRINTF("Transmitting %d bytes\n\r", len);
     nrf24_write_register(REG_FLUSH_TX, 0);
     nrf24_read_write_vector_register(REG_WRITE,
                                      REG_WRITE_TX,
