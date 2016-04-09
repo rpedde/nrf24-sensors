@@ -76,16 +76,22 @@ extern volatile uint8_t switch_irq;
 #undef SWITCH_SENSOR
 {% endif %}
 
-{% if temp is defined and temp.type == 'DHT11' %}
-#define DHT11_SENSOR
-
-#define DHT11_DDR  DDR{{temp.port}}
-#define DHT11_OUTP PORT{{temp.port}}
-#define DHT11_INP  PIN{{temp.port}}
-#define DHT11_PIN  {{temp.pin}}
+/* Temperature sensors */
+{% if temp is defined and temp.type == 'DHT11' or temp.type == 'DHT22' -%}
+#define DHT_SENSOR                   /* DHT11 or DHT22 */
+{% if temp.type == 'DHT11' -%}
+#define DHT_SENSOR_MODEL SENSOR_MODEL_DHT11
 {% else -%}
-/* No DHT11 temp sensor */
-#undef DHT11_SENSOR
+#define DHT_SENSOR_MODEL SENSOR_MODEL_DHT22
+{% endif %}
+#define DHT_DDR  DDR{{temp.port}}
+#define DHT_OUTP PORT{{temp.port}}
+#define DHT_INP  PIN{{temp.port}}
+#define DHT_PIN  {{temp.pin}}
+
+{% else -%}
+/* No DHT temp sensor */
+#undef DHT_SENSOR
 {% endif %}
 
 #endif /* _HARDWARE_H_ */

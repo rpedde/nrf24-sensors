@@ -7,6 +7,37 @@ import os
 from jinja2 import Environment, FileSystemLoader
 import yaml
 
+extra_sources = {
+    'battery': ['battery.c'],
+    'temp.type.DHT11': ['dht.c'],
+    'temp.type.DHT22': ['dht.c'],
+    'switch': ['switch.c']
+}
+
+
+def find_extras(params):
+    extra = []
+
+    for k, v in extra_sources.iteritems():
+        if '.' in k:
+            # walk to the last, and see if the last matches the value
+            ptr = params
+            keys = k.split('.')
+
+            for key in keys[:-1]:
+                if key in ptr:
+                    ptr = ptr[key]
+                else:
+                    ptr = {}
+
+            if ptr == keys[-1]:
+                extra += v
+        else:
+            if k in params:
+                extra += v
+
+    return extra
+
 
 def calculate_metavars(params):
     params['extra_sources'] = ['hardware.c']
@@ -14,24 +45,29 @@ def calculate_metavars(params):
     params['extra_ldflags'] = []
 
     if params.get('debug', False):
-        if 'uart' in params and params['uart']['type'] == 'soft':
-            params['extra_sources'].append('soft_uart.c')
-        if 'uart' in params and params['uart']['type'] == 'hard':
-            params['extra_sources'].append('hard_uart.c')
+        extra_sources['uart.type.soft'] = ['soft_uart.c']
+        extra_sources['uart.type.hard'] = ['hard_uart.c']
 
-    if 'battery' in params:
-        params['extra_sources'].append('battery.c')
+    params['extra_sources'] += find_extras(params)
 
-    if 'temp' in params and params['temp']['type'] == 'DHT11':
-        params['extra_sources'].append('dht11.c')
+        # if 'uart' in params and params['uart']['type'] == 'soft':
+        #     params['extra_sources'].append('soft_uart.c')
+        # if 'uart' in params and params['uart']['type'] == 'hard':
+        #     params['extra_sources'].append('hard_uart.c')
+
+    # if 'battery' in params:
+    #     params['extra_sources'].append('battery.c')
+
+    # if 'temp' in params and params['temp']['type'] == 'DHT11' or params['temp']['type'] == 'DHT22':
+    #     params['extra_sources'].append('dht.c')
 
     if params.get('debug', False):
         params['extra_cdefs'].append('-DDEBUG')
         params['extra_cdefs'].append('-Wl,-u,vfprintf')
         params['extra_ldflags'].append('-lprintf_flt -lm')
 
-    if 'switch' in params:
-        params['extra_sources'].append('switch.c')
+    # if 'switch' in params:
+    #     params['extra_sources'].append('switch.c')
 
     return params
 

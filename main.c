@@ -20,8 +20,8 @@
 #include "switch.h"
 #endif
 
-#ifdef DHT11_SENSOR
-#include "dht11.h"
+#ifdef DHT_SENSOR
+#include "dht.h"
 #endif
 
 #define CPU_PRESCALE(n) (CLKPR = 0x80, CLKPR = (n))
@@ -64,8 +64,8 @@ void init_sensors(void) {
     switch_init();
 #endif
 
-#ifdef DHT11_SENSOR
-    dht11_init();
+#ifdef DHT_SENSOR
+    dht_init();
 #endif
 }
 
@@ -78,8 +78,8 @@ void sleep(void) {
     switch_sleep();
 #endif
 
-#ifdef DHT11_SENSOR
-    dht11_sleep();
+#ifdef DHT_SENSOR
+    dht_sleep();
 #endif
 }
 
@@ -92,8 +92,8 @@ void wake(void) {
     switch_wake();
 #endif
 
-#ifdef DHT11_SENSOR
-    dht11_wake();
+#ifdef DHT_SENSOR
+    dht_wake();
 #endif
 }
 
@@ -132,6 +132,7 @@ int main(int argc, char *argv[]) {
             if (val != -1) {
                 DPRINTF("Switch %d: new state: %d\n\r", x, val);
                 packet.type = SENSOR_TYPE_RO_SWITCH;
+                packet.model = SENSOR_MODEL_NONE;
                 packet.type_instance = x;
                 packet.value.uint8_value = val;
                 nrf24_transmit((uint8_t *)&packet, sizeof(packet));
@@ -139,8 +140,18 @@ int main(int argc, char *argv[]) {
         }
 #endif
 
-#ifdef DHT11_SENSOR
-        dht11_read_data();
+#ifdef DHT_SENSOR
+        if(dht_read_data()) {
+            packet.type = SENSOR_TYPE_HUMIDITY;
+            packet.model = DHT_SENSOR_MODEL;
+            packet.type_instance = 0;
+            packet.value.uint16_value = dht_get_rh();
+            nrf24_transmit((uint8_t *)&packet, sizeof(packet));
+
+            packet.type = SENSOR_TYPE_TEMP;
+            packet.value.uint16_value = dht_get_temp();
+            nrf24_transmit((uint8_t *)&packet, sizeof(packet));
+        }
 #endif
 
         _delay_ms(8000);

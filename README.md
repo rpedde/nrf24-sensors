@@ -17,8 +17,8 @@ PRs welcome.
 
 ## TX sensors ##
 - [ ] TMP36 temperature sensor
-- [ ] DHT22 temperature/humidity sensor
-- [ ] DHT11 temperature/humidity sensor
+- [X] DHT22 temperature/humidity sensor
+- [X] DHT11 temperature/humidity sensor
 - [ ] DS18B20 temperature sensor
 - [X] Switch monitoring
 

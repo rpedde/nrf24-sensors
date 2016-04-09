@@ -23,6 +23,6 @@ switch:
     - { pin: 1 }
 
 temp:
-  type: DHT11
+  type: DHT22
   port: F
   pin: 7
