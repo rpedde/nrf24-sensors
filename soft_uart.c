@@ -23,6 +23,7 @@
 #include <util/delay.h>
 
 #include "util.h"
+#include "hardware.h"
 #include "soft_uart.h"
 
 void uart_init(void) {

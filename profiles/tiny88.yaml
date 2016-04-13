@@ -1,0 +1,33 @@
+mcu: attiny88
+f_cpu: 8000000
+debug: true
+
+rx_address: AEAEAEAE01
+tx_address: AEAEAEAEFF
+
+uart:
+  type: soft
+  baud: 9600
+  port: D
+  pin: 0
+
+spi:
+  type: hard
+
+nrf24:
+  ce_port: B
+  ce_pin: 0
+
+temp:
+  type: DHT11
+  port: C
+  pin: 0
+
+switch:
+  irq_pin: 0
+  port: C
+  switches:
+    - { pin: 2 }
+    - { pin: 3 }
+    - { pin: 4 }
+    - { pin: 5 }

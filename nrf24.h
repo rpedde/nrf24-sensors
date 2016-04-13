@@ -18,9 +18,14 @@
 #ifndef __NRF24_H__
 #define __NRF24_H__
 
-#define NRF_CE_DDR  DDRD
-#define NRF_CE_PORT PORTD
-#define NRF_CE_PIN  5
+#include "hardware.h"
+
+/* should be set by build template */
+#ifndef NRF_CE_DDR
+# define NRF_CE_DDR  DDRD
+# define NRF_CE_PORT PORTD
+# define NRF_CE_PIN  5
+#endif
 
 /* Register Map */
 #define REG_CONFIG        0x00  /* config register */

@@ -10,6 +10,13 @@ uart:
   port: D
   pin: 7
 
+spi:
+  type: hard
+
+nrf24:
+  ce_port: D
+  ce_pin: 5
+
 # battery:
 #   battery_pin: 0
 #   vcc_pin: 1

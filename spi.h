@@ -27,6 +27,13 @@
 # define SPI_SCK_PIN  1
 # define SPI_MOSI_PIN 2
 # define SPI_MISO_PIN 3
+#elif defined(__AVR_ATtiny88__) || defined(__AVR_ATtiny44__)
+# define SPI_DDR      DDRB
+# define SPI_PORT     PORTB
+# define SPI_SS_PIN   2
+# define SPI_SCK_PIN  5
+# define SPI_MOSI_PIN 3
+# define SPI_MISO_PIN 4
 #else
 # error Unhandled CPU in spi.h
 #endif

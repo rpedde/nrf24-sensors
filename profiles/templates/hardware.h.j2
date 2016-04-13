@@ -25,6 +25,24 @@
 extern uint8_t rx_address[5];  /* 0x{{ rx_address }} */
 extern uint8_t tx_address[5];  /* 0x{{ tx_address }} */
 
+/* SPI settings */
+{% if spi is defined and spi.type == 'hard' -%}
+#define SPI_TYPE_HARD
+{% else -%}
+#define SPI_TYPE_SOFT
+#define SPI_DDR       DDR{{ spi.port }}
+#define SPI_PORT      PORT{{ spi.port }}
+#define SPI_SS_PIN    {{ spi.ss_pin }}
+#define SPI_SCK_PIN   {{ spi.sck_pin }}
+#define SPI_MOSI_PIN  {{ spi.mosi_pin }}
+#define SPI_MISO_PIN  {{ spi.miso_pin }}
+{% endif %}
+
+/* nRF24 Settings */
+#define NRF_CE_DDR    DDR{{ nrf24.ce_port }}
+#define NRF_CE_PORT   PORT{{ nrf24.ce_port }}
+#define NRF_CE_PIN    {{ nrf24.ce_pin }}
+
 {% if uart is defined and uart.type == 'soft' and debug is defined and debug -%}
 /* Soft UART Defines */
 #define UART_SOFT_BAUD {{ uart.baud }}
@@ -77,7 +95,7 @@ extern volatile uint8_t switch_irq;
 {% endif %}
 
 /* Temperature sensors */
-{% if temp is defined and temp.type == 'DHT11' or temp.type == 'DHT22' -%}
+{% if temp is defined and (temp.type == 'DHT11' or temp.type == 'DHT22') -%}
 #define DHT_SENSOR                   /* DHT11 or DHT22 */
 {% if temp.type == 'DHT11' -%}
 #define DHT_SENSOR_MODEL SENSOR_MODEL_DHT11

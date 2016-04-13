@@ -24,11 +24,6 @@
 
 #include <stdint.h>
 
-#define UART_SOFT_BAUD 9600
-#define UART_SOFT_DDR DDRD
-#define UART_SOFT_PORT PORTD
-#define UART_SOFT_PIN 7
-
 #define UART_SOFT_DELAY_US (int) (1000000.0/((float) UART_SOFT_BAUD) + 0.5)
 
 extern void uart_init(void);

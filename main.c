@@ -100,12 +100,20 @@ void wake(void) {
 int main(int argc, char *argv[]) {
     sensor_struct_t packet;
 
-    CPU_PRESCALE(0x01);
+    /* CPU_PRESCALE(0x01); */
 
     uart_init();
 
     DPRINTF("\x1b[2J\x1b[1;1H** Start **\n\r\n\r");
     DPRINTF("sizeof packet: %d\n\r", sizeof(packet));
+
+    /* while(1) { */
+    /*     SETBIT(DDRD, 2); */
+    /*     SETBIT(PORTD, 2); */
+    /*     _delay_ms(1000); */
+    /*     CLEARBIT(PORTD, 2); */
+    /*     _delay_ms(1000); */
+    /* } */
 
     nrf24_init();
     nrf24_config_tx(tx_address, rx_address);

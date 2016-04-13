@@ -18,6 +18,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+#include "hardware.h"
 #include "util.h"
 #include "spi.h"
 #include "nrf24.h"

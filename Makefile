@@ -50,7 +50,7 @@ TARGET = main
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = $(TARGET).c spi.c nrf24.c $(EXTRA_SOURCES)
+SRC = $(TARGET).c nrf24.c $(EXTRA_SOURCES)
 
 
 # List Assembler source files here.
@@ -191,7 +191,7 @@ LDFLAGS += $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB) $(EXTRA_LDFLAGS)
 # Type: avrdude -c ?
 # to get a full listing.
 #
-AVRDUDE_PROGRAMMER = stk500
+AVRDUDE_PROGRAMMER = avrisp2
 
 # com1 = serial port. Use lpt1 to connect to parallel port.
 AVRDUDE_PORT = com1    # programmer connected to serial device

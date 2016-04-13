@@ -50,6 +50,8 @@ extern uint16_t dht_get_rh(void);
 # define DHT_PRESCALE_REG TCCR0B
 #elif defined(__AVR_ATmega32U4__)
 # define DHT_PRESCALE_REG TCCR0
+#elif defined(__AVR_ATtiny88__) || defined(__AVR_Attiny44__)
+# define DHT_PRESCALE_REG TCCR0A
 #else
 # error Unhandled CPU in dht.h
 #endif
