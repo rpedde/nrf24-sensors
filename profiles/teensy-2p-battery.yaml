@@ -4,6 +4,9 @@ debug: true
 rx_address: AEAEAEAE00
 tx_address: AEAEAEAEFF
 
+# Internal freq is 16MHz, we'll step it down to 8.
+soft_prescalar: 1
+
 uart:
   type: soft
   baud: 9600

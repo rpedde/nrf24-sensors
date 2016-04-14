@@ -51,11 +51,6 @@ def calculate_metavars(params):
 
     params['extra_sources'] += find_extras(params)
 
-        # if 'uart' in params and params['uart']['type'] == 'soft':
-        #     params['extra_sources'].append('soft_uart.c')
-        # if 'uart' in params and params['uart']['type'] == 'hard':
-        #     params['extra_sources'].append('hard_uart.c')
-
     # if 'battery' in params:
     #     params['extra_sources'].append('battery.c')
 
@@ -64,8 +59,8 @@ def calculate_metavars(params):
 
     if params.get('debug', False):
         params['extra_cdefs'].append('-DDEBUG')
-        params['extra_cdefs'].append('-Wl,-u,vfprintf')
-        params['extra_ldflags'].append('-lprintf_flt -lm')
+        # params['extra_cdefs'].append('-Wl,-u,vfprintf')
+        # params['extra_ldflags'].append('-lprintf_flt -lm')
 
     # if 'switch' in params:
     #     params['extra_sources'].append('switch.c')

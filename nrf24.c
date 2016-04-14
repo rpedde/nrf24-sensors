@@ -24,6 +24,8 @@
 #include "nrf24.h"
 #include "soft_uart.h"
 
+static char *label="nRF: ";
+
 static void fix_addr(uint8_t *src, uint8_t *dst, uint8_t len) {
     uint8_t idx=0;
 
@@ -34,7 +36,7 @@ static void fix_addr(uint8_t *src, uint8_t *dst, uint8_t len) {
 
 void nrf24_init(void) {
     /* turn on SPI */
-    DPRINTF("Initializing nRF24\n\r");
+    DPUTS(label); DPUTS("init:0"); DCR;
 
     /* wait for powerup */
     _delay_ms(100);
@@ -49,7 +51,7 @@ void nrf24_init(void) {
 
     _delay_ms(100);
 
-    DPRINTF("Initialized\n\r");
+    DPUTS(label); DPUTS("init:1"); DCR;
 }
 
 void nrf24_config_tx(uint8_t *tx_addr, uint8_t *rx_addr) {
@@ -170,7 +172,7 @@ void nrf24_reset_irq(void) {
 }
 
 void nrf24_transmit(uint8_t *buf, uint8_t len) {
-    DPRINTF("Transmitting %d bytes\n\r", len);
+    DPUTS(label); DPUTS("tx "); DPUTBYTEX(len); DCR;
     nrf24_write_register(REG_FLUSH_TX, 0);
     nrf24_read_write_vector_register(REG_WRITE,
                                      REG_WRITE_TX,
@@ -216,17 +218,13 @@ void nrf24_read_write_vector_register(uint8_t direction, /* REG_READ/WRITE */
     if (reg == REG_FLUSH_RX || reg == REG_FLUSH_TX)
         len = 0;
 
-    /* DPRINTF(" --- SPI: Sending $%02x\n\r", reg); */
     spi_send(reg);
 
     _delay_us(10);
     for(uint8_t idx=0; idx<len; idx++) {
         if (direction == REG_READ) {
-            /* DPRINTF(" --- SPI: Reading via NOP\n\r"); */
             buffer[idx] = spi_send(REG_NOP);
-            /* DPRINTF(" --- SPI: Read $%02x\n\r", buffer[idx]); */
         } else {
-            /* DPRINTF(" --- SPI: Writing $%02x\n\r", buffer[idx]); */
             spi_send(buffer[idx]);
         }
         _delay_us(10);
@@ -245,7 +243,7 @@ uint8_t nrf24_read_register(uint8_t reg) {
 
 void nrf24_write_register(uint8_t reg, uint8_t value) {
     if(reg == REG_CONFIG) {
-        DPRINTF("Writing $%02x to CONFIG\n\r", value);
+        DPUTS(label); DPUTBYTEX(value); DPUTS("->CFG"); DCR;
     }
     nrf24_read_write_vector_register(REG_WRITE, reg, &value, 1);
 }

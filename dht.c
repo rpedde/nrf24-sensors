@@ -25,9 +25,10 @@
 #include "dht.h"
 
 static uint8_t dht_data[5];
+static char *label="dht: ";
 
 void dht_init(void) {
-    DPRINTF("Initializing DHT\n\r");
+    DPUTS(label); DPUTS("init"); DCR;
     // input
     CLEARBIT(DHT_DDR, DHT_PIN);
     _delay_ms(2000);
@@ -63,6 +64,8 @@ static int dht_wait_for_value(int val, int timeout) {
 int dht_read_data(void) {
     int res;
 
+    DPUTS(label); DPUTS("read "); DPUTS("start"); DCR;
+
     SETBIT(DHT_DDR, DHT_PIN);       /* set to output */
     CLEARBIT(DHT_OUTP, DHT_PIN);    /* output low */
 
@@ -81,24 +84,24 @@ int dht_read_data(void) {
         (DHT_CS02 << CS02);
 
     if((res = dht_wait_for_value(0, DHT_FORTY)) > DHT_FORTY) {
-        DPRINTF("DHT: Init timeout: %d, %02X\n\r", res, DHT_INP);
+        DPUTS(label); DPUTS("fail:"); DPUTS("0"); DCR;
         return FALSE;
     }
 
     if((res = dht_wait_for_value(1, DHT_HUNDRED)) > DHT_HUNDRED) {
-        DPRINTF("DHT: High timeout: %d, %02X\n\r", res, DHT_INP);
+        DPUTS(label); DPUTS("fail:"); DPUTS("1"); DCR;
         return FALSE;
     }
 
     if(dht_wait_for_value(0, DHT_HUNDRED) > DHT_HUNDRED) {
-        DPRINTF("DHT: Low timeout\n\r");
+        DPUTS(label); DPUTS("fail:"); DPUTS("2"); DCR;
         return FALSE;
     }
 
     for(int i=0; i<5; i++) {
         for(int j=0; j<8; j++) {
             if(dht_wait_for_value(1, DHT_EIGHTY) > DHT_EIGHTY) {
-                DPRINTF("DHT: Timeout\n\r");
+                DPUTS(label); DPUTS("fail:"); DPUTS("3"); DCR;
                 return FALSE;
             }
 
@@ -115,33 +118,33 @@ int dht_read_data(void) {
         dht_data[2] + dht_data[3];
 
     if (data != dht_data[4]) {
-        DPRINTF("DHT: Checksum error: %02X %02X %02X %02X %02X\n\r",
-            dht_data[0], dht_data[1], dht_data[2],
-            dht_data[3], dht_data[4]);
+        DPUTS(label); DPUTS("fail:"); DPUTS("4"); DCR;
         return FALSE;
     }
 
+    DPUTS(label);
     for(int i=0; i<5; i++) {
-        DPRINTF("%02X ", dht_data[i]);
+        DPUTBYTEX(dht_data[i]); DPUTS(" ");
     }
-    DPRINTF("\n\r");
+    DCR;
 
-    /* DHT11 format */
-    if(DHT_SENSOR_MODEL == SENSOR_MODEL_DHT11) {
-        DPRINTF("Humidity:    %0d.%02d percent\n\r", dht_data[0], dht_data[1]);
-        DPRINTF("Temperature: %0d.%02d degrees C\n\r", dht_data[2], dht_data[3]);
-    }
+    /* /\* DHT11 format *\/ */
+    /* if(DHT_SENSOR_MODEL == SENSOR_MODEL_DHT11) { */
+    /*     DPRINTF("Humidity:    %0d.%02d percent\n\r", dht_data[0], dht_data[1]); */
+    /*     DPRINTF("Temperature: %0d.%02d degrees C\n\r", dht_data[2], dht_data[3]); */
+    /* } */
 
-    if(DHT_SENSOR_MODEL == SENSOR_MODEL_DHT22) {
-        uint16_t h, t;
-        h = dht_data[0] << 8 | dht_data[1];
-        t = dht_data[2] << 8 | dht_data[3];
+    /* if(DHT_SENSOR_MODEL == SENSOR_MODEL_DHT22) { */
+    /*     uint16_t h, t; */
+    /*     h = dht_data[0] << 8 | dht_data[1]; */
+    /*     t = dht_data[2] << 8 | dht_data[3]; */
 
-        /* DHT22 (tenths) */
-        DPRINTF("Hum: %0.2f\n\r", (float)h/10.0);
-        DPRINTF("Temp: %0.2f\n\r", ((float)t/10.0) * (9.0/5.0) + 32);
-    }
+    /*     /\* DHT22 (tenths) *\/ */
+    /*     DPRINTF("Hum: %0.2f\n\r", (float)h/10.0); */
+    /*     DPRINTF("Temp: %0.2f\n\r", ((float)t/10.0) * (9.0/5.0) + 32); */
+    /* } */
 
+    DPUTS(label); DPUTS("read "); DPUTS("end"); DCR;
     return TRUE;
 }
 

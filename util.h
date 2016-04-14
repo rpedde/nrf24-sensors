@@ -18,6 +18,8 @@
 #ifndef __UTIL_H__
 #define __UTIL_H__
 
+#include <stdint.h>
+
 #define SETBIT(byte, bit) (byte) |= (1 << (bit))
 #define CLEARBIT(byte, bit) (byte) &= (~(1 << (bit)))
 #define ISSET(byte, bit) (byte) & (1 << (bit))
@@ -28,10 +30,23 @@
 
 #ifdef DEBUG
 extern void uart_printf(char *fmt, ...);
+extern void uart_send_string(char *);
+extern void uart_print_hex_byte(uint8_t);
+extern void uart_print_hex_word(uint16_t);
 
 # define DPRINTF(fmt, args...) uart_printf(fmt, ##args)
+# define DPUTS(str) uart_send_string((str))
+# define DPUTBYTEX(byte) uart_print_hex_byte((byte))
+# define DPUTWORDX(word) uart_print_hex_word((word))
+# define DCR uart_send_string("\n\r") 
 #else
 # define DPRINTF(fmt, args...)
+# define DPUTS(str)
+# define DPUTBYTEX(byte)
+# define DPUTWORDX(word)
+# define DCR
 #endif
+
+
 
 #endif /* __UTIL_H__ */

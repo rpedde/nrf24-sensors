@@ -53,7 +53,7 @@ volatile uint8_t switch_irq = 0;
 
 /* Interrupt service routing for switch press */
 ISR(INT{{switch.irq_pin}}_vect) {
-    DPRINTF("Switch IRQ\n\r");
+    DPUTS("Switch IRQ\n\r");
     switch_irq = 1;
 }
 {% endif %}

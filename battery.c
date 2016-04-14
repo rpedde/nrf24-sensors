@@ -27,11 +27,12 @@
 #include "battery.h"
 
 float battery_internal_vref;
+static char *label="batt: ";
 
 void battery_init(void) {
     uint8_t val;
 
-    DPRINTF("Initializing ADC\n\r");
+    DPUTS(label); DPUTS("init"); DCR;
 
     /* set the adc pins to input */
     CLEARBIT(ADC_DDR, BATTERY_ADC_PIN);
@@ -53,19 +54,13 @@ void battery_init(void) {
 #endif
 
 
-    DPRINTF("ADMUX: %02x\n\r", ADMUX);
-
     /* read the battery voltage to determine internal vref */
     ADCSRA |= _BV(ADSC);
     loop_until_bit_is_clear(ADCSRA, ADSC);
 
     val = ADCH;
 
-    DPRINTF("Read VCC voltage of %02x\n\r", val);
-
     battery_internal_vref = (val * BATTERY_VCC) / 255.0;
-
-    DPRINTF("Calculated internal vref: %g\n\r", battery_internal_vref);
 
     ADMUX = _BV(REFS1) | _BF(REFS0)
 }
@@ -86,7 +81,5 @@ float battery_get(void) {
     loop_until_bit_is_clear(ADCSRA, ADSC);
 
     val = ADCH;
-    DPRINTF("Read battery voltage of %02x\n\r", val);
-
     return 0.0;
 }

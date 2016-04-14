@@ -112,4 +112,18 @@ extern volatile uint8_t switch_irq;
 #undef DHT_SENSOR
 {% endif %}
 
+/* Oscillator Calibration */
+{% if osccal_addr is defined -%}
+#define OSCCAL_EEPROM_ADDR {{osccal_addr}}
+{% else %}
+#undef OSCCAL_EEPROM_ADDR    /* no internal oscillator */
+{% endif %}
+
+/* Soft prescalar */
+{% if soft_prescalar is defined %}
+#define SOFT_PRESCALAR {{ soft_prescalar }}
+{% else %}
+#define SOFT_PRESCALAR 0x0
+{% endif %}
+
 #endif /* _HARDWARE_H_ */

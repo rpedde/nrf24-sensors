@@ -71,12 +71,3 @@ void uart_print_hex_word(uint16_t word) {
     uart_print_hex_byte((uint8_t)(word >> 8));
 }
 
-void uart_printf(char *fmt, ...) {
-    static char buf[40];
-
-    va_list args;
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
-    va_end(args);
-    uart_send_string(buf);
-}

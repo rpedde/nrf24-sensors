@@ -1,9 +1,17 @@
+#
+# Fuse: -U lfuse:w:0xEE:m -U hfuse:w:0xDD:m -U efuse:w:0x06:m
+#
+# Incidentally, I figure efuse as 0xFE, but avrdude reads unused
+# bits strangely or something.  Dunno.
+#
 mcu: attiny88
 f_cpu: 8000000
 debug: true
 
 rx_address: AEAEAEAE01
 tx_address: AEAEAEAEFF
+
+# osccal_addr: 0
 
 uart:
   type: soft
