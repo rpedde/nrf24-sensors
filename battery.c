@@ -20,27 +20,21 @@
 
 #include <avr/sfr_defs.h>
 #include <avr/io.h>
-#include <avr/delay.h>
+#include <util/delay.h>
 
 #include "util.h"
 #include "hardware.h"
 #include "battery.h"
 
-float battery_internal_vref;
-static char *label="batt: ";
+static char *label="bat: ";
+static uint8_t val;
 
 void battery_init(void) {
-    uint8_t val;
-
     DPUTS(label); DPUTS("init"); DCR;
 
     /* set the adc pins to input */
-    CLEARBIT(ADC_DDR, BATTERY_ADC_PIN);
-    CLEARBIT(ADC_PORT, BATTERY_ADC_PIN);
-
-    /* set up ADC */
-    ADMUX = ADMUX_INTERNAL;
-    ADMUX |= _BV(ADLAR);                /* left justified */
+    CLEARBIT(ADC_DDR, BATTERY_VIN_PIN);
+    CLEARBIT(ADC_PORT, BATTERY_VIN_PIN);
 
     /* enable adc */
     ADCSRA = _BV(ADEN);
@@ -52,17 +46,6 @@ void battery_init(void) {
 #else
 # error "Set ADC prescalar"
 #endif
-
-
-    /* read the battery voltage to determine internal vref */
-    ADCSRA |= _BV(ADSC);
-    loop_until_bit_is_clear(ADCSRA, ADSC);
-
-    val = ADCH;
-
-    battery_internal_vref = (val * BATTERY_VCC) / 255.0;
-
-    ADMUX = _BV(REFS1) | _BF(REFS0)
 }
 
 void battery_sleep(void) {
@@ -71,15 +54,18 @@ void battery_sleep(void) {
 void battery_wake(void) {
 }
 
-float battery_get(void) {
-    uint8_t val;
-
-    ADMUX &= 0b11110000;
-    ADMUX |= BATTERY_ADC_PIN;
+uint8_t battery_get(void) {
+    ADMUX = _BV(REFS0) | _BV(ADLAR) | BATTERY_ADC_PIN;
 
     ADCSRA |= _BV(ADSC);
     loop_until_bit_is_clear(ADCSRA, ADSC);
 
     val = ADCH;
-    return 0.0;
+
+    DPUTS(label); DPUTBYTEX(val); DCR;
+    return TRUE;
+}
+
+uint8_t battery_read(void) {
+    return val;
 }

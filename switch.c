@@ -22,6 +22,8 @@
 #include "hardware.h"
 #include "switch.h"
 
+static char *label = "sw : ";
+
 void switch_init(void) {
     int x;
 
@@ -56,5 +58,6 @@ float switch_get(int which) {
         return -1;
 
     switch_records[which].state = val;
+    DPUTS(label); DPUTBYTEX(which); DPUTS("->"); DPUTBYTEX(val); DCR;
     return val;
 }

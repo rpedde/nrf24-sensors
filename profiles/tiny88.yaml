@@ -13,6 +13,9 @@ tx_address: AEAEAEAEFF
 
 # osccal_addr: 0
 
+battery:
+  pin: 1
+
 uart:
   type: soft
   baud: 9600

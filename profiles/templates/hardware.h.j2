@@ -55,10 +55,8 @@ extern uint8_t tx_address[5];  /* 0x{{ tx_address }} */
 
 {% if battery is defined -%}
 /* Battery defines */
-#define BATTERY_SENSOR    /* enable battery sensing */
-#define BATTERY_ADC_PIN {{ battery.battery_pin }} /* ADC battery pin */
-#define BATTERY_VCC_PIN {{ battery.vcc_pin }} /* ADC vcc pin */
-#define BATTERY_VCC     {{ battery.vcc }}
+#define BATTERY_SENSOR         /* enable battery sensing */
+#define BATTERY_ADC_PIN      {{battery.adc_pin}}
 {% else -%}
 /* No battery sensor */
 #undef BATTERY_SENSOR      /* disable battery sensing */
@@ -98,9 +96,9 @@ extern volatile uint8_t switch_irq;
 {% if temp is defined and (temp.type == 'DHT11' or temp.type == 'DHT22') -%}
 #define DHT_SENSOR                   /* DHT11 or DHT22 */
 {% if temp.type == 'DHT11' -%}
-#define DHT_SENSOR_MODEL SENSOR_MODEL_DHT11
+#define DHT_SENSOR_MODEL TEMP_MODEL_DHT11
 {% else -%}
-#define DHT_SENSOR_MODEL SENSOR_MODEL_DHT22
+#define DHT_SENSOR_MODEL TEMP_MODEL_DHT22
 {% endif %}
 #define DHT_DDR  DDR{{temp.port}}
 #define DHT_OUTP PORT{{temp.port}}

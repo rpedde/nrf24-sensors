@@ -27,40 +27,6 @@
 
 #define CPU_PRESCALE(n) (CLKPR = 0x80, CLKPR = (n))
 
-/* void dump_status(void) { */
-/*     uint8_t addrbuffer[5]; */
-
-/*     DCR; */
-/*     DPUTS(" CONFIG:     "); DPUTBYTEX(nrf24_read_register(REG_CONFIG)); DCR; */
-/*     DPUTS(" EN_AA:      "); DPUTBYTEX(nrf24_read_register(REG_EN_AA)); DCR; */
-/*     DPUTS(" EN_RXADDR:  "); DPUTBYTEX(nrf24_read_register(REG_EN_RXADDR)); DCR; */
-/*     DPUTS(" SETUP_AW:   "); DPUTBYTEX(nrf24_read_register(REG_SETUP_AW)); DCR; */
-/*     DPUTS(" SETUP_RETR: "); DPUTBYTEX(nrf24_read_register(REG_SETUP_RETR)); DCR; */
-/*     DPUTS(" RF_CH:      "); DPUTBYTEX(nrf24_read_register(REG_RF_CH)); DCR; */
-/*     DPUTS(" RF_SETUP:   "); DPUTBYTEX(nrf24_read_register(REG_RF_SETUP)); DCR; */
-
-/*     nrf24_read_write_vector_register(REG_READ, */
-/*                                      REG_TX_ADDR, */
-/*                                      addrbuffer, */
-/*                                      5); */
-/*     DPUTS(" TX_ADDR:    "); */
-/*     for(int i=0; i < 5; i++) { */
-/*         DPUTBYTEX(addrbuffer[i]); */
-/*     } */
-/*     DCR; */
-
-/*     nrf24_read_write_vector_register(REG_READ, */
-/*                                      REG_RX_ADDR_P0, */
-/*                                      addrbuffer, */
-/*                                      5); */
-
-/*     DPUTS(" RX_ADDR:    "); */
-/*     for(int i=0; i < 5; i++) { */
-/*         DPUTBYTEX(addrbuffer[i]); */
-/*     } */
-/*     DCR; */
-/* } */
-
 void init_sensors(void) {
 #ifdef BATTERY_SENSOR
     battery_init();
@@ -112,7 +78,6 @@ int main(int argc, char *argv[]) {
     CPU_PRESCALE(SOFT_PRESCALAR);
 #endif
 
-
     uart_init();
 
 #ifdef OSCCAL_EEPROM_ADDR
@@ -120,16 +85,7 @@ int main(int argc, char *argv[]) {
     OSCCAL = osccal;
 #endif
 
-    DPUTS("\x1b[2J\x1b[1;1H** Start **\n\r\n\r");
-    DPUTS("Packet size: "); DPUTBYTEX(sizeof(packet)); DCR;
-
-    /* while(1) { */
-    /*     SETBIT(DDRD, 2); */
-    /*     SETBIT(PORTD, 2); */
-    /*     _delay_ms(1000); */
-    /*     CLEARBIT(PORTD, 2); */
-    /*     _delay_ms(1000); */
-    /* } */
+    DPUTS("\x1b[2J\x1b[1;1HStartup\n\r");
 
     nrf24_init();
     nrf24_config_tx(tx_address, rx_address);
@@ -143,23 +99,23 @@ int main(int argc, char *argv[]) {
     /* init hardware sensors */
     init_sensors();
 
-    DDRC &= ~(_BV(4) | _BV(5));    // input
-    PORTC |= (_BV(4) | _BV(5));    // enable pullups
-
     while(1) {
         _delay_ms(10000);
 
 #ifdef BATTERY_SENSOR
-        battery_get();
+        if(battery_get()) {
+            packet.type = SENSOR_TYPE_VOLTAGE;
+            packet.model = VOLT_MODEL_8B_2X33VREF;
+            packet.type_instance = 0;
+            packet.value.uint8_value = battery_read();
+            nrf24_transmit((uint8_t *)&packet, sizeof(packet));
+        }
 #endif
 
 #ifdef SWITCH_SENSOR
         for(int x = 0; x < SWITCH_LENGTH; x++) {
             int val = switch_get(x);
             if (val != -1) {
-                DPUTS("Switch "); DPUTBYTEX(x); DPUTS(" new state: ");
-                DPUTBYTEX(val); DCR;
-
                 packet.type = SENSOR_TYPE_RO_SWITCH;
                 packet.model = SENSOR_MODEL_NONE;
                 packet.type_instance = x;
