@@ -33,8 +33,12 @@ void battery_init(void) {
     DPUTS(label); DPUTS("init"); DCR;
 
     /* set the adc pins to input */
-    CLEARBIT(ADC_DDR, BATTERY_VIN_PIN);
-    CLEARBIT(ADC_PORT, BATTERY_VIN_PIN);
+    CLEARBIT(ADC_DDR, BATTERY_ADC_PIN);
+    CLEARBIT(ADC_PORT, BATTERY_ADC_PIN);
+
+    /* set the battery enable pin low */
+    SETBIT(BATTERY_EN_DDR, BATTERY_EN_PIN);
+    CLEARBIT(BATTERY_EN_PORT, BATTERY_EN_PIN);
 
     /* enable adc */
     ADCSRA = _BV(ADEN);
@@ -44,7 +48,7 @@ void battery_init(void) {
 #if F_CPU == 8000000
     ADCSRA |= _BV(ADPS2) | _BV(ADPS1);  /* 64 */
 #else
-# error "Set ADC prescalar"
+#   error "Set ADC prescalar"
 #endif
 }
 
@@ -55,6 +59,9 @@ void battery_wake(void) {
 }
 
 uint8_t battery_get(void) {
+    SETBIT(BATTERY_EN_DDR, BATTERY_EN_PIN);  /* output */
+    SETBIT(BATTERY_EN_PORT, BATTERY_EN_PIN);
+
     ADMUX = _BV(REFS0) | _BV(ADLAR) | BATTERY_ADC_PIN;
 
     ADCSRA |= _BV(ADSC);
@@ -63,6 +70,10 @@ uint8_t battery_get(void) {
     val = ADCH;
 
     DPUTS(label); DPUTBYTEX(val); DCR;
+
+    /* back to high z */
+    /* CLEARBIT(BATTERY_EN_DDR, BATTERY_EN_PIN); */
+    CLEARBIT(BATTERY_EN_PORT, BATTERY_EN_PIN);
     return TRUE;
 }
 

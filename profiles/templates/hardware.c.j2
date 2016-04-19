@@ -49,11 +49,4 @@ switch_record_t switch_records[{{switch.switches|length}}] = {
 {% endfor -%}
 };
 
-volatile uint8_t switch_irq = 0;
-
-/* Interrupt service routing for switch press */
-ISR(INT{{switch.irq_pin}}_vect) {
-    DPUTS("sw : IRQ"); DCR;
-    switch_irq = 1;
-}
 {% endif %}

@@ -14,7 +14,9 @@ tx_address: AEAEAEAEFF
 # osccal_addr: 0
 
 battery:
-  pin: 1
+  adc_pin: 1
+  en_port: D
+  en_pin: 2
 
 uart:
   type: soft
@@ -35,7 +37,6 @@ temp:
   pin: 0
 
 switch:
-  irq_pin: 0
   port: C
   switches:
     - { pin: 2 }

@@ -37,10 +37,10 @@ void switch_init(void) {
     }
 
     /* enable external interrupts */
-    SREG |= _BV(7);
-    EIMSK |= _BV(SWITCH_IRQ);
-    SETBIT(SWITCH_EIC, SWITCH_ISC0);
-    CLEARBIT(SWITCH_EIC, SWITCH_ISC1);
+    /* SREG |= _BV(7); */
+    /* EIMSK |= _BV(SWITCH_IRQ); */
+    /* SETBIT(SWITCH_EIC, SWITCH_ISC0); */
+    /* CLEARBIT(SWITCH_EIC, SWITCH_ISC1); */
 }
 
 void switch_sleep(void) {

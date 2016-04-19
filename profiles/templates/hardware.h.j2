@@ -57,6 +57,9 @@ extern uint8_t tx_address[5];  /* 0x{{ tx_address }} */
 /* Battery defines */
 #define BATTERY_SENSOR         /* enable battery sensing */
 #define BATTERY_ADC_PIN      {{battery.adc_pin}}
+#define BATTERY_EN_DDR       DDR{{battery.en_port}}
+#define BATTERY_EN_PORT      PORT{{battery.en_port}}
+#define BATTERY_EN_PIN       {{battery.en_pin}}
 {% else -%}
 /* No battery sensor */
 #undef BATTERY_SENSOR      /* disable battery sensing */
@@ -66,15 +69,9 @@ extern uint8_t tx_address[5];  /* 0x{{ tx_address }} */
 /* Switch defines */
 #define SWITCH_SENSOR
 
-#define SWITCH_IRQ  INT{{switch.irq_pin}}
 #define SWITCH_DDR  DDR{{switch.port}}
 #define SWITCH_PIN  PIN{{switch.port}}
 #define SWITCH_PORT PORT{{switch.port}}
-{% if switch.irq_pin > 3 -%}
-#define SWITCH_EIC  EICRB
-{% else -%}
-#define SWITCH_EIC  EICRA
-{% endif %}
 #define SWITCH_ISC0 ISC{{switch.irq_pin}}0
 #define SWITCH_ISC1 ISC{{switch.irq_pin}}1
 
