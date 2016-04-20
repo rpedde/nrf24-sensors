@@ -28,6 +28,7 @@
 # error Unhandled ADC port
 #endif
 
+
 extern void battery_init(void);
 extern void battery_sleep(void);
 extern void battery_wake(void);

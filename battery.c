@@ -28,6 +28,7 @@
 
 static char *label="bat: ";
 static uint16_t val;
+static int sample_count = BATTERY_INTERVAL;
 
 void battery_init(void) {
     DPUTS(label); DPUTS("init"); DCR;
@@ -53,12 +54,20 @@ void battery_init(void) {
 }
 
 void battery_sleep(void) {
+    CLEARBIT(ADCSRA, ADEN);
 }
 
 void battery_wake(void) {
 }
 
 int battery_get(void) {
+    sample_count++;
+    if(sample_count < BATTERY_INTERVAL) {
+        return FALSE;
+    }
+    sample_count = 0;
+    SETBIT(ADCSRA, ADEN);
+
     /* turn on the battery voltage divider */
     SETBIT(BATTERY_EN_PORT, BATTERY_EN_PIN);
 

@@ -26,6 +26,7 @@
 
 static uint8_t dht_data[5];
 static char *label="dht: ";
+static int sample_count = DHT_INTERVAL;
 
 void dht_init(void) {
     DPUTS(label); DPUTS("init"); DCR;
@@ -60,9 +61,14 @@ static int dht_wait_for_value(int val, int timeout) {
     return TCNT0;
 }
 
-
-int dht_read_data(void) {
+int dht_get(void) {
     int res;
+
+    sample_count++;
+    if(sample_count < DHT_INTERVAL) {
+        return FALSE;
+    }
+    sample_count = 0;
 
     DPUTS(label); DPUTS("read "); DPUTS("start"); DCR;
 

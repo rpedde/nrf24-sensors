@@ -1,10 +1,11 @@
-#include <avr/io.h>
 #include <stdio.h>
 #include <string.h>
 
-#include <util/delay.h>
+#include <avr/io.h>
+#include <avr/sleep.h>
 #include <avr/interrupt.h>
 #include <avr/eeprom.h>
+#include <util/delay.h>
 
 #include "soft_uart.h"
 #include "spi.h"
@@ -26,6 +27,14 @@
 #endif
 
 #define CPU_PRESCALE(n) (CLKPR = 0x80, CLKPR = (n))
+#define DEBOUNCE_TIME 10  // time to stable in ms
+
+volatile int irq_wdt = 1;
+volatile int irq_switch = 1;
+
+ISR(WDT_vect) {
+    irq_wdt = 1;
+}
 
 void init_sensors(void) {
 #ifdef BATTERY_SENSOR
@@ -42,6 +51,8 @@ void init_sensors(void) {
 }
 
 void sleep(void) {
+    int count = 0;
+
 #ifdef BATTERY_SENSOR
     battery_sleep();
 #endif
@@ -53,6 +64,23 @@ void sleep(void) {
 #ifdef DHT_SENSOR
     dht_sleep();
 #endif
+
+    while(count < 4) {  /* 24 seconds */
+        irq_wdt = 0;
+        irq_switch = 0;
+
+        set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+        sleep_enable();
+        sleep_mode();
+
+        /* we break early on switch press */
+        if(irq_switch)
+            break;
+
+        count++;
+    }
+
+    sleep_disable();
 }
 
 void wake(void) {
@@ -67,6 +95,13 @@ void wake(void) {
 #ifdef DHT_SENSOR
     dht_wake();
 #endif
+}
+
+void init_wdt(void) {
+    SETBIT(MCUSR, WDRF);
+    WDTCSR |= _BV(WDCE) | _BV(WDE);
+    WDTCSR = _BV(WDP0) | _BV(WDP3);
+    SETBIT(WDTCSR, WDIE);
 }
 
 
@@ -99,49 +134,53 @@ int main(int argc, char *argv[]) {
     /* init hardware sensors */
     init_sensors();
 
+    init_wdt();
+
     while(1) {
-        _delay_ms(10000);
 
+        if(irq_wdt) {
 #ifdef BATTERY_SENSOR
-        if(battery_get()) {
-            packet.type = SENSOR_TYPE_VOLTAGE;
-            packet.model = VOLT_MODEL_16B_2X33VREF;
-            packet.type_instance = 0;
-            packet.value.uint16_value = battery_read();
-            nrf24_transmit((uint8_t *)&packet, sizeof(packet));
-        }
-#endif
-
-#ifdef SWITCH_SENSOR
-        for(int x = 0; x < SWITCH_LENGTH; x++) {
-            int val = switch_get(x);
-            if (val != -1) {
-                packet.type = SENSOR_TYPE_RO_SWITCH;
-                packet.model = SENSOR_MODEL_NONE;
-                packet.type_instance = x;
-                packet.value.uint8_value = val;
+            if(battery_get()) {
+                packet.type = SENSOR_TYPE_VOLTAGE;
+                packet.model = VOLT_MODEL_16B_2X33VREF;
+                packet.type_instance = 0;
+                packet.value.uint16_value = battery_read();
                 nrf24_transmit((uint8_t *)&packet, sizeof(packet));
             }
-        }
 #endif
 
 #ifdef DHT_SENSOR
-        if(dht_read_data()) {
-            packet.type = SENSOR_TYPE_HUMIDITY;
-            packet.model = DHT_SENSOR_MODEL;
-            packet.type_instance = 0;
-            packet.value.uint16_value = dht_get_rh();
-            nrf24_transmit((uint8_t *)&packet, sizeof(packet));
+            if(dht_get()) {
+                packet.type = SENSOR_TYPE_HUMIDITY;
+                packet.model = DHT_SENSOR_MODEL;
+                packet.type_instance = 0;
+                packet.value.uint16_value = dht_get_rh();
+                nrf24_transmit((uint8_t *)&packet, sizeof(packet));
 
-            packet.type = SENSOR_TYPE_TEMP;
-            packet.value.uint16_value = dht_get_temp();
-            nrf24_transmit((uint8_t *)&packet, sizeof(packet));
-        }
+                packet.type = SENSOR_TYPE_TEMP;
+                packet.value.uint16_value = dht_get_temp();
+                nrf24_transmit((uint8_t *)&packet, sizeof(packet));
+            }
 #endif
+        }
 
-        _delay_ms(20000);
+        if(irq_switch) {
+#ifdef SWITCH_SENSOR
+            _delay_ms(DEBOUNCE_TIME);
 
-        /* while(!switch_irq); */
-        /* switch_irq = 0; */
+            for(int x = 0; x < SWITCH_LENGTH; x++) {
+                int val = switch_get(x);
+                if (val != -1) {
+                    packet.type = SENSOR_TYPE_RO_SWITCH;
+                    packet.model = SENSOR_MODEL_NONE;
+                    packet.type_instance = x;
+                    packet.value.uint8_value = val;
+                    nrf24_transmit((uint8_t *)&packet, sizeof(packet));
+                }
+            }
+#endif
+        }
+
+        sleep();
     }
 }

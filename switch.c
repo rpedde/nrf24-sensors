@@ -17,6 +17,7 @@
 
 #include <avr/sfr_defs.h>
 #include <avr/io.h>
+#include <avr/interrupt.h>
 
 #include "util.h"
 #include "hardware.h"
@@ -36,11 +37,12 @@ void switch_init(void) {
         SETBIT(SWITCH_PORT, switch_records[x].pin);
     }
 
-    /* enable external interrupts */
-    /* SREG |= _BV(7); */
-    /* EIMSK |= _BV(SWITCH_IRQ); */
-    /* SETBIT(SWITCH_EIC, SWITCH_ISC0); */
-    /* CLEARBIT(SWITCH_EIC, SWITCH_ISC1); */
+    /* enable pin change */
+    PCICR = _BV(PCIE1);
+    PCIFR = _BV(PCIF1);
+    PCMSK1 = _BV(PCINT10) | _BV(PCINT11) | _BV(PCINT12) | _BV(PCINT13);
+
+    sei();
 }
 
 void switch_sleep(void) {

@@ -49,4 +49,10 @@ switch_record_t switch_records[{{switch.switches|length}}] = {
 {% endfor -%}
 };
 
+extern volatile int irq_switch;
+
+ISR(PCINT1_vect) {
+    irq_switch = 1;
+}
+
 {% endif %}

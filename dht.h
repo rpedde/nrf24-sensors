@@ -22,7 +22,7 @@ extern void dht_init(void);
 extern void dht_sleep(void);
 extern void dht_wake(void);
 
-extern int dht_read_data(void);
+extern int dht_get(void);
 
 extern uint16_t dht_get_temp(void);
 extern uint16_t dht_get_rh(void);
