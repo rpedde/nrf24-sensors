@@ -105,9 +105,9 @@ int main(int argc, char *argv[]) {
 #ifdef BATTERY_SENSOR
         if(battery_get()) {
             packet.type = SENSOR_TYPE_VOLTAGE;
-            packet.model = VOLT_MODEL_8B_2X33VREF;
+            packet.model = VOLT_MODEL_16B_2X33VREF;
             packet.type_instance = 0;
-            packet.value.uint8_value = battery_read();
+            packet.value.uint16_value = battery_read();
             nrf24_transmit((uint8_t *)&packet, sizeof(packet));
         }
 #endif

@@ -67,7 +67,6 @@ void uart_print_hex_byte(uint8_t byte) {
 }
 
 void uart_print_hex_word(uint16_t word) {
-    uart_print_hex_byte((uint8_t)(word & 0x00FF));
     uart_print_hex_byte((uint8_t)(word >> 8));
+    uart_print_hex_byte((uint8_t)(word & 0x00FF));
 }
-

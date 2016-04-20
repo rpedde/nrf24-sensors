@@ -27,7 +27,7 @@
 #include "battery.h"
 
 static char *label="bat: ";
-static uint8_t val;
+static uint16_t val;
 
 void battery_init(void) {
     DPUTS(label); DPUTS("init"); DCR;
@@ -58,8 +58,8 @@ void battery_sleep(void) {
 void battery_wake(void) {
 }
 
-uint8_t battery_get(void) {
-    SETBIT(BATTERY_EN_DDR, BATTERY_EN_PIN);  /* output */
+int battery_get(void) {
+    /* turn on the battery voltage divider */
     SETBIT(BATTERY_EN_PORT, BATTERY_EN_PIN);
 
     ADMUX = _BV(REFS0) | _BV(ADLAR) | BATTERY_ADC_PIN;
@@ -67,16 +67,16 @@ uint8_t battery_get(void) {
     ADCSRA |= _BV(ADSC);
     loop_until_bit_is_clear(ADCSRA, ADSC);
 
-    val = ADCH;
+    val = ADCH << 8;
+    val |= ADCL;
 
-    DPUTS(label); DPUTBYTEX(val); DCR;
+    DPUTS(label); DPUTWORDX(val); DCR;
 
-    /* back to high z */
-    /* CLEARBIT(BATTERY_EN_DDR, BATTERY_EN_PIN); */
+    /* turn off the battery voltage divider */
     CLEARBIT(BATTERY_EN_PORT, BATTERY_EN_PIN);
     return TRUE;
 }
 
-uint8_t battery_read(void) {
+uint16_t battery_read(void) {
     return val;
 }

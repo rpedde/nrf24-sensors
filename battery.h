@@ -31,7 +31,7 @@
 extern void battery_init(void);
 extern void battery_sleep(void);
 extern void battery_wake(void);
-extern uint8_t battery_get(void);
-extern uint8_t battery_read(void);
+extern int battery_get(void);
+extern uint16_t battery_read(void);
 
 #endif /* _BATTERY_H_ */
