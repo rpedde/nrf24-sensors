@@ -65,6 +65,8 @@ void sleep(void) {
     dht_sleep();
 #endif
 
+    sei();
+
     while(count < 4) {  /* 24 seconds */
         irq_wdt = 0;
         irq_switch = 0;
