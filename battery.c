@@ -76,8 +76,8 @@ int battery_get(void) {
     ADCSRA |= _BV(ADSC);
     loop_until_bit_is_clear(ADCSRA, ADSC);
 
-    val = ADCH << 8;
-    val |= ADCL;
+    val = ADCL;
+    val |= ADCH << 8;
 
     DPUTS(label); DPUTWORDX(val); DCR;
 
