@@ -103,7 +103,6 @@ extern volatile uint8_t switch_irq;
 #define DHT_INP      PIN{{temp.port}}
 #define DHT_PIN      {{temp.pin}}
 #define DHT_INTERVAL {{temp.interval if temp.interval is defined else "10"}}
-
 {% else -%}
 /* No DHT temp sensor */
 #undef DHT_SENSOR
@@ -116,13 +115,13 @@ extern volatile uint8_t switch_irq;
 #undef OSCCAL_EEPROM_ADDR    /* no internal oscillator */
 {% endif %}
 
-
 /* Sleep indicator LED */
 {% if sleep_indicator is defined %}
 #define SLEEP_INDICATOR
 #define INDICATOR_DDR   DDR{{sleep_indicator.port}}
 #define INDICATOR_PORT  PORT{{sleep_indicator.port}}
 #define INDICATOR_PIN   {{sleep_indicator.pin}}
+#define INDICATOR_DELAY {{sleep_indicator.delay if sleep_indicator.delay is defined else "10"}}
 {% else %}
 #undef SLEEP_INDICATOR
 {% endif %}

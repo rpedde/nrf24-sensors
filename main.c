@@ -58,6 +58,25 @@ void init_sensors(void) {
 #endif
 }
 
+void wake(void) {
+#ifdef SLEEP_INDICATOR
+    indicator_wake();
+#endif
+
+#ifdef BATTERY_SENSOR
+    battery_wake();
+#endif
+
+#ifdef SWITCH_SENSOR
+    switch_wake();
+#endif
+
+#ifdef DHT_SENSOR
+    dht_wake();
+#endif
+
+}
+
 void sleep(void) {
     int count = 0;
 
@@ -95,26 +114,9 @@ void sleep(void) {
     }
 
     sleep_disable();
+    wake();
 }
 
-void wake(void) {
-#ifdef BATTERY_SENSOR
-    battery_wake();
-#endif
-
-#ifdef SWITCH_SENSOR
-    switch_wake();
-#endif
-
-#ifdef DHT_SENSOR
-    dht_wake();
-#endif
-
-#ifdef SLEEP_INDICATOR
-    indicator_wake();
-#endif
-
-}
 
 void init_wdt(void) {
     SETBIT(MCUSR, WDRF);

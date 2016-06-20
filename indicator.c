@@ -16,6 +16,7 @@
  */
 
 #include <avr/io.h>
+#include <util/delay.h>
 
 #include "util.h"
 #include "hardware.h"
@@ -34,4 +35,8 @@ void indicator_sleep(void) {
 void indicator_wake(void) {
     /* turn on the indictator pin */
     SETBIT(INDICATOR_PORT, INDICATOR_PIN);
+#if INDICATOR_DELAY > 0
+    _delay_ms(INDICATOR_DELAY);
+#endif
+
 }
