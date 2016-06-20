@@ -35,3 +35,7 @@ temp:
   type: DHT11
   port: C
   pin: 0
+
+sleep_indicator:
+  port: D
+  pin: 4

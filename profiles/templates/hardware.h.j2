@@ -116,6 +116,17 @@ extern volatile uint8_t switch_irq;
 #undef OSCCAL_EEPROM_ADDR    /* no internal oscillator */
 {% endif %}
 
+
+/* Sleep indicator LED */
+{% if sleep_indicator is defined %}
+#define SLEEP_INDICATOR
+#define INDICATOR_DDR   DDR{{sleep_indicator.port}}
+#define INDICATOR_PORT  PORT{{sleep_indicator.port}}
+#define INDICATOR_PIN   {{sleep_indicator.pin}}
+{% else %}
+#undef SLEEP_INDICATOR
+{% endif %}
+
 /* Soft prescalar */
 {% if soft_prescalar is defined %}
 #define SOFT_PRESCALAR {{ soft_prescalar }}

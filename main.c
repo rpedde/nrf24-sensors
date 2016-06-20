@@ -26,6 +26,10 @@
 #include "dht.h"
 #endif
 
+#ifdef SLEEP_INDICATOR
+#include "indicator.h"
+#endif
+
 #define CPU_PRESCALE(n) (CLKPR = 0x80, CLKPR = (n))
 #define DEBOUNCE_TIME 10  // time to stable in ms
 
@@ -37,6 +41,10 @@ ISR(WDT_vect) {
 }
 
 void init_sensors(void) {
+#ifdef SLEEP_INDICATOR
+    indicator_init();
+#endif
+
 #ifdef BATTERY_SENSOR
     battery_init();
 #endif
@@ -63,6 +71,10 @@ void sleep(void) {
 
 #ifdef DHT_SENSOR
     dht_sleep();
+#endif
+
+#ifdef SLEEP_INDICATOR
+    indicator_sleep();
 #endif
 
     sei();
@@ -97,6 +109,11 @@ void wake(void) {
 #ifdef DHT_SENSOR
     dht_wake();
 #endif
+
+#ifdef SLEEP_INDICATOR
+    indicator_wake();
+#endif
+
 }
 
 void init_wdt(void) {
