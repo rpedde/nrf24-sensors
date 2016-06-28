@@ -41,17 +41,29 @@ uint8_t tx_address[5] = {
     0x{{ tx_address[8:10] }}
 };
 
-{% if switch is defined -%}
+{% if switches is defined -%}
 /* Switch data */
-switch_record_t switch_records[{{switch.switches|length}}] = {
-{% for item in switch.switches -%}
-    {{ '   { ' + item.pin|string }}, 0 },
+switch_record_t switch_records[{{switches|length}}] = {
+{% for item in switches -%}
+{{'    '}}{ &PORT{{item.port}}, &DDR{{item.port}}, &PIN{{item.port}}, {{item.pcint}}, {{item.pin}}, 0 },
 {% endfor -%}
 };
 
 extern volatile int irq_switch;
 
+ISR(PCINT0_vect) {
+    irq_switch = 1;
+}
+
 ISR(PCINT1_vect) {
+    irq_switch = 1;
+}
+
+ISR(PCINT2_vect) {
+    irq_switch = 1;
+}
+
+ISR(PCINT3_vect) {
     irq_switch = 1;
 }
 

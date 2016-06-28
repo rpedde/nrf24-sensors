@@ -12,7 +12,7 @@ extra_sources = {
     'temp.type.DHT11': ['dht.c'],
     'temp.type.DHT22': ['dht.c'],
     'spi.type.hard': ['spi.c'],
-    'switch': ['switch.c'],
+    'switches': ['switch.c'],
     'sleep_indicator': ['indicator.c']
 
 }

@@ -66,24 +66,22 @@ extern uint8_t tx_address[5];  /* 0x{{ tx_address }} */
 #undef BATTERY_SENSOR      /* disable battery sensing */
 {% endif %}
 
-{% if switch is defined -%}
+{% if switches is defined -%}
 /* Switch defines */
 #define SWITCH_SENSOR
 
-#define SWITCH_DDR  DDR{{switch.port}}
-#define SWITCH_PIN  PIN{{switch.port}}
-#define SWITCH_PORT PORT{{switch.port}}
-#define SWITCH_ISC0 ISC{{switch.irq_pin}}0
-#define SWITCH_ISC1 ISC{{switch.irq_pin}}1
-
 typedef struct switch_record_t {
-    int pin;
-    int state;
+    volatile uint8_t *PORT;
+    volatile uint8_t *DDR;
+    volatile uint8_t *PIN;
+    uint8_t pcint;
+    uint8_t pin;
+    uint8_t state;
 } switch_record_t;
 
-#define SWITCH_LENGTH {{ switch.switches|length }}
+#define SWITCH_LENGTH {{ switches|length }}
 
-extern switch_record_t switch_records[{{ switch.switches|length }}];
+extern switch_record_t switch_records[{{ switches|length }}];
 extern volatile uint8_t switch_irq;
 
 {% else -%}

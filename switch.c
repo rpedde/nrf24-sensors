@@ -28,19 +28,43 @@ static char *label = "sw : ";
 void switch_init(void) {
     int x;
 
+    PCMSK0 = 0;
+    PCMSK1 = 0;
+    PCMSK2 = 0;
+    PCMSK3 = 0;
+
     /* Set directions on switch ports */
     for(x = 0; x < SWITCH_LENGTH; x++) {
         /* set to input */
-        CLEARBIT(SWITCH_DDR, switch_records[x].pin);
-        switch_records[x].state = -1;
+        *switch_records[x].DDR &= ~_BV(switch_records[x].pin);
         /* enable pullup */
-        SETBIT(SWITCH_PORT, switch_records[x].pin);
+        *switch_records[x].PORT |= _BV(switch_records[x].pin);
+        /* set initial state */
+        switch_records[x].state = -1;
+
+        if(switch_records[x].pcint < 8) {
+            PCMSK0 |= _BV(switch_records[x].pcint);
+            PCICR |= _BV(PCIE0);
+            PCIFR |= _BV(PCIF0);
+        } else if(switch_records[x].pcint < 16) {
+            PCMSK1 |= _BV(switch_records[x].pcint - 8);
+            PCICR |= _BV(PCIE1);
+            PCIFR |= _BV(PCIF1);
+        } else if(switch_records[x].pcint < 24) {
+            PCMSK2 |= _BV(switch_records[x].pcint - 16);
+            PCICR |= _BV(PCIE2);
+            PCIFR |= _BV(PCIF2);
+        } else {
+            PCMSK3 |= _BV(switch_records[x].pcint - 24);
+            PCICR |= _BV(PCIE3);
+            PCIFR |= _BV(PCIF3);
+        }
     }
 
     /* enable pin change */
-    PCICR = _BV(PCIE1);
-    PCIFR = _BV(PCIF1);
-    PCMSK1 = _BV(PCINT10) | _BV(PCINT11) | _BV(PCINT12) | _BV(PCINT13);
+    /* PCICR = _BV(PCIE1); */
+    /* PCIFR = _BV(PCIF1); */
+    /* PCMSK1 = _BV(PCINT10) | _BV(PCINT11) | _BV(PCINT12) | _BV(PCINT13); */
 
     sei();
 }
@@ -54,7 +78,7 @@ void switch_wake(void) {
 float switch_get(int which) {
     int val;
 
-    val = SWITCH_PIN & _BV(switch_records[which].pin) ? 0 : 1;
+    val = *switch_records[which].PIN & _BV(switch_records[which].pin) ? 0 : 1;
 
     if(val == switch_records[which].state)
         return -1;
